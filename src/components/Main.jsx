@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { TextField } from "@mui/material";
+import axios from "axios";
 
 const ButtonAppBar = ({ handleChoolseFile }) => {
   return (
@@ -47,10 +48,22 @@ const Main = () => {
     // Perform actions with the selected file (e.g., upload, process, etc.)
     if (fileValue) {
       console.log("Selected file:", fileValue);
-
+      const data = new FormData();
+      data.append('file', fileValue);
+      data.append('filename', fileValue.name)
       // Display the selected image on the page
       const imageUrl = URL.createObjectURL(fileValue);
       // Now `imageUrl` can be used as the source for an <img> element
+      axios.post('/api',data, {  headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
       // Example: Set imageUrl to the state or use it directly in the render
       setDisplayImage(imageUrl);
