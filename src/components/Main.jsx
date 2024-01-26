@@ -31,8 +31,23 @@ const Main = () => {
   const [uploadFile, setUploadFile] = useState(false);
   const [displayImage, setDisplayImage] = useState("");
   const [fileValue, setFileValue] = useState(null);
-  const [generatedImg, setGeneratedImg] = useState("765");
+  const [generatedImg, setGeneratedImg] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
+  const handleColorize = () => {
+    axios.get('/api/color_output/'+fileValue.name, {  headers: {
+      'Content-Type': 'application/json'
+    }
+    })
+    .then(function (response) {
+
+      setGeneratedImg(response.data.data)
+    })
+    .catch(function (error) {
+      console.log("Line>>>> "+error.response.data.message);
+      // setErrorMessage(error.response.data.message)
+    });
+  };
   const handleChoolseFile = () => {
     setUploadFile(!uploadFile);
   };
@@ -59,10 +74,12 @@ const Main = () => {
       }
       })
       .then(function (response) {
-        console.log(response);
+        console.log("Line 77>>> ",response);
+        setErrorMessage(null)
       })
       .catch(function (error) {
-        console.log(error);
+        console.log("Line>>>> 80 "+error.response.data.message);
+        setErrorMessage(error.response.data.message)
       });
 
       // Example: Set imageUrl to the state or use it directly in the render
@@ -72,7 +89,7 @@ const Main = () => {
     }
   };
 
-  console.log("Line 42", fileValue, displayImage);
+  console.log("Line 91", fileValue, displayImage);
 
   return (
     <React.Fragment>
@@ -91,9 +108,14 @@ const Main = () => {
             />
             {fileValue !== null && (
               <Button variant="contained" onClick={handleSubmit}>
-                Submit
+                Submit 
               </Button>
-            )}
+            
+            )
+           
+              }
+             
+              
           </Box>
         )}
       </Box>
@@ -113,11 +135,18 @@ const Main = () => {
               <img style={{ width: "100%" }} src={displayImage} />
             </Box>
             <Box style={{ width: generatedImg ? "100%" : "50%" }}>
-              <img style={{ width: "100%" }} src={displayImage} />
+              {generatedImg &&<img style={{ width: "100%" }} src={`data:image/jpeg;base64,${generatedImg}`} />}
             </Box>
           </Box>
+       
         </React.Fragment>
       )}
+      {displayImage && !errorMessage && <Button variant="contained" onClick={handleColorize}>
+          Colorize
+              </Button>}<span> Image may get resized to conserve CPU processing</span>
+        <div style={{fontWeight:900,fontSize:'2rem'}}>
+        {errorMessage}
+        </div>
     </React.Fragment>
   );
 };
